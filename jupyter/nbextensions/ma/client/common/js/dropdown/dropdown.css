@@ -197,7 +197,6 @@
 
 .dk_fouc select {
   position: relative;
-  top: 0em;
-  visibility: visible;
-  color: #aaa;
+  top: -99999em;
+  visibility: hidden;
 }

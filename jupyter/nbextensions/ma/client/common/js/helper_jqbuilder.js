@@ -106,7 +106,6 @@ define(['exports',
                       )
                     )
                   );
-
   };
 
 
@@ -155,7 +154,6 @@ define(['exports',
                               $('<li/>').append(
                                 $('<a/>', {text: 'Submit', id: 'submitBtn'}))))
     );
-
     return af;
   }
 
@@ -338,83 +336,27 @@ define(['exports',
    */
 
   exports.wizard.assignmentContainer = function() {
-    var arr = $('<div/>', {class: 'mining-step clearfix large step3'});
-    var newas = $('<a/>').append($('<i/>', {class: 'fa fa-plus fa-2x'}));
+    var arr = $('<div/>', {id: 'flowchartHolder'});
+    var flowchartPane = $('<div/>', {id: 'flowchartPane'});
+    var flowchartSelector = $('<div/>', {id: 'flowchartSelector'});
+    var assignmentDetails = $('<div/>', {id: 'assignmentDetails', class: "mining-step clearfix large step3", style: "height: 150px; width:100%"});
 
-    var assignmentCount = 1
-	
-    $(newas).on('click',function(event) {
-     if (assignmentCount > 1) {
-       $('select.selector').append($('<option/>', {value: 'end', text: 'Assignment ' + assignmentCount}));
-     }
-
-      var as = createAssignmentWrapper(assignmentCount);
-
-
-      /**
-        * When clicking on the + button, a new assignment wrapper is
-        * added to the page
-        */
-      $(as).on('click', 'i.fa-times', function(){
-        $('.assignment.aactive .aactions ul li').prependTo($('.acont').first());
-        $(as).remove();
-      });
-
-      /**
-        * Make the current assignment active when focus is on.
-        * Only one assignment can be active and actions can be added
-        * only to active assignments.
-        */
-      $(as).focus(function() {
-        $(".aactive").each(function(index) {
-          $(this).removeClass('aactive');
-        });
-        $(this).addClass('aactive');
-      });
-
-      $(".aactive").each(function(index) {
-        $(this).removeClass('aactive');
-      });
-
-      /**
-        * Make the current assignment active. New created assignments
-        * are the active ones.
-         */
-      $(as).addClass('aactive');
-
-      $(newas).before(as);
-      console.log("test01");
-
-
-      assignmentCount = assignmentCount + 1;
-
-      $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
-        console.log("finish loading and running test.js. with a status of");
-        initMe();
-      });
-
-    });
-
-    $(arr).append(newas);
-
-
+    $(arr).append(flowchartSelector);
+    $(arr).append(flowchartPane);
+    $(arr).append(assignmentDetails);
 
     return arr;
+  };
 
-
-  }
 
   /**
    * This method generates the assignment DOM object when the "+" icon is clicked
    * @method createAssignmentWrapper
    * @return {Object} returns the Object containing the DOM element
    */
-  var createAssignmentWrapper = function(assignmentCount){
-
-    return $('<div/>', {class: 'assignment', id: 'myflowchart', 'tabindex': 1}).append(
-        $('<span/>', {text: 'Assignment '+assignmentCount, class: 'stitle'}).append(
-                    $('<i/>', {class: 'fa fa-times'})
-                ),
+  var createAssignmentWrapper = function(number){
+        return $('<div/>', {class: 'assignment', 'tabindex': 1, id: 'ass'+number}).append(
+                $('<span/>', {text: 'Assignment Details:'+number, class: 'stitle'}),
                 $('<div/>').append(
                     $('<div/>', {style: 'display: table; width: 100%'}).append(
                         $('<i/>', {class: 'fa fa-list'}),
@@ -423,20 +365,36 @@ define(['exports',
                     $('<div/>', {style: 'display: table; width: 100%'}).append(
                         $('<i/>', {class: 'fa fa-sticky-note', style: 'vertical-align: top; padding: 10px 1em'}),
                         $('<textarea/>', {class: 'adescription', placeholder: 'Enter assignment description'})
-                    ),
-                    $('<div/>', {style: 'display: table; width: 100%;'}).append(
-                        $('<i/>', {class: 'fa fa-link'}),
-                        $('<select/>', {class: 'selector', name: 'optionlist', id: 'nextass'+assignmentCount}).append(
-                          $('<option/>', {selected: 'selected', value: '0', text: 'Select next Assignment' }),
-                          $('<option/>', {value: 'end', text: 'Last Assignment' }))
-                    ),
-                    $('<div/>', {style: 'display: table; width: 100%;'}).append(
-                        $('<i/>', {class: 'fa fa-user'}),
-                        $('<input/>', {class: 'ainput', name: 'owner', placeholder: 'Owner Email Address(es) [separate by semicolas]'}).attr('autocomplete', 'on')
                     )
-                )
-    );
-  }
+              )
+            );
+  };
+
+  exports.createNewAssignmentDetail = function(number){
+    var newAs = createAssignmentWrapper(number);
+    $(newAs).addClass('aactive');
+    $("#assignmentDetails").append(newAs);
+
+  };
+
+  exports.activateAssignmentDetail = function(number){
+    $("#ass"+number).show();
+    $("#ass"+number).addClass('aactive');
+
+  };
+
+  exports.deactivateAssignmentDetail = function(number){
+    $(".aactive").each(function(index) {
+        $(this).removeClass('aactive');
+        $(this).hide();
+      });
+
+  };
+
+  exports.deleteAssignmentDetail = function(number) {
+    $("#ass"+number).remove();
+
+  };
 
 
 
