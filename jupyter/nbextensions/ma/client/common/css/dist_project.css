@@ -98,13 +98,13 @@ div.stepcontent {
 }
 
 .mining-step.thin {
-  width: 30%;
+  width: 14%;
   height: 100%;
   margin: 0 0.2%;
 }
 
 .mining-step.short {
-  height: 400px;
+  height: 250px;
 }
 
 .mining-step.large {
@@ -135,15 +135,14 @@ div.stepcontent {
   -moz-border-radius: 5px;
   border-radius: 5px;
   /*padding: 0.6em;*/
-  text-align: left;
-  color: #dbe1e8;
+  color: #aaa;
 
 }
 
 .mining-step.large .assignment.aactive{
   background: white;
   outline: none;
-  color: #dbe1e8;
+  color: white;
 }
 
 .mining-step.large .assignment > div > div > i{
@@ -181,13 +180,13 @@ div.stepcontent {
 
  }
 
-.ainput,.anext, .adescription {
+.ainput, .adescription {
   margin: 0.5em 0;
   display: block;
 }
 
 .mining-step.large .assignment .adescription, .mining-step.large .assignment .aactions,
-.mining-step.large .assignment .ainput,.mining-step.large .assignment .anext{
+.mining-step.large .assignment .ainput{
   margin: 0.2em 0;
 }
 
@@ -330,7 +329,7 @@ span.stitle {
 }
 
 .mining-step .saction {
-  text-align: left;
+  text-align: center;
   padding: 0;
   display: block;
 }
@@ -490,6 +489,7 @@ div.proverview {
   height: 100%;
   background: #fff;
   display: block;
+  float: left;
   overflow: scroll;
   border-radius: 5px;
   color: @base2;
@@ -637,7 +637,7 @@ div.proverview {
   padding: 5px;
 }
 
-.assignment .adescription, .assignment .aactions, .assignment .ainput, .assignment .anext{
+.assignment .adescription, .assignment .aactions, .assignment .ainput{
   margin: 0.2em 0;
 }
 
@@ -650,7 +650,7 @@ div.proverview {
 }
 
 
-.assignment .ainput, .assignment .anext{
+.assignment .ainput, .ainput{
   height: 35px;
   border: none;
   padding: 3px;
@@ -716,6 +716,11 @@ div.proverview {
   background: white;
   margin: 0 1%;
 }
+
+.pr {
+  width: 80%;
+}
+
 .master .content .mining-step .project_item {
   background: fade(@base-green, 90%);
   padding: 10px;
@@ -1032,16 +1037,14 @@ border-radius: 5px 5px 0 0;
 -webkit-border-radius: 5px 5px 0 0;
 -moz-border-radius: 5px 5px 0 0;
 float: left;
+text-align: center;
 padding: 0em 0.2em;
 margin: 0 1%;
 }
-
-
 .mining-step.step3 .ms-body{
   background: none;
   color: #337ab7;
 }
-
 .mining-step .ms-body {
   width: 100%;
   height: 100%;
@@ -1052,17 +1055,13 @@ margin: 0 1%;
   background-color: #2c3e50;
   color: #fff;
 }
-
-
 .mining-step span {
   display: block;
 font-size: 1.1em;
 padding-bottom: 0.5em;
 }
-
 span.stitle {
 display: block;
-
 font-size: 1em;
 padding: 0.7em 0em;
 background: rgba(44, 62, 80, 0.9);
@@ -1070,7 +1069,6 @@ border-radius: 3px 3px 0 0;
 color: white;
 font-weight: 500;
 }
-
 .mining-step .ms-body .acon{
 display: block;
 height: 95%;
@@ -1081,5 +1079,4 @@ background: #fff;
 overflow: scroll;
 color: #337ab7;
 }
-
 */

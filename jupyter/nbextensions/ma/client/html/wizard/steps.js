@@ -87,7 +87,6 @@ define([
         $(".acont").append($(this));
       });
 
-
     }
 
     if (currentIndex == 2 && newIndex == 3) {
@@ -122,7 +121,6 @@ define([
 
     if(currentIndex == 3){
         g_projobj['variables'] = $('#p_variables').html();
-        console.log(g_projobj);
     }
 
     if (newIndex == 4) {
@@ -308,6 +306,7 @@ define([
       */
     gdapi.init.then(
       function(res){
+          alert("hdll");
         /**
           *  Is Google API loaded, Initialize the wizard object
           */
@@ -316,8 +315,8 @@ define([
         /**
           * Initialize the wizard steps
           */
-
         initWizardSteps();
+
       }, function(err){
         console.log(err);
       }

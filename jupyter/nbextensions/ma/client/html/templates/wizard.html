@@ -1,7 +1,7 @@
 {% extends "page.html" %} {% block title %}{{page_title}}{% endblock %}
 {% block stylesheet %} {{super()}}
 <script type="text/javascript" charset="utf-8" data-requiremodule="jquery" src="/static/components/jquery/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.7.6/go-debug.js"></script>
+<script type="text/javascript" charset="utf-8" src="/nbextensions/ma/client/common/js/go-watermark.js"></script>
 
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
@@ -33,32 +33,21 @@
   "linkFromPortIdProperty": "fromPort",
   "linkToPortIdProperty": "toPort",
   "nodeDataArray": [
-{"category":"Comment", "loc":"360 -10", "text":"Kookie Brittle", "key":-13},
-{"key":-1, "category":"Start", "loc":"175 0", "text":"Start"},
-{"key":0, "loc":"0 77", "text":"Preheat oven to 375 F"},
-{"key":1, "loc":"175 100", "text":"In a bowl, blend: 1 cup margarine, 1.5 teaspoon vanilla, 1 teaspoon salt"},
-{"key":2, "loc":"175 190", "text":"Gradually beat in 1 cup sugar and 2 cups sifted flour"},
-{"key":3, "loc":"175 270", "text":"Mix in 6 oz (1 cup) Nestle's Semi-Sweet Chocolate Morsels"},
-{"key":4, "loc":"175 370", "text":"Press evenly into ungreased 15x10x1 pan"},
-{"key":5, "loc":"352 85", "text":"Finely chop 1/2 cup of your choice of nuts"},
-{"key":6, "loc":"175 440", "text":"Sprinkle nuts on top"},
-{"key":7, "loc":"175 500", "text":"Bake for 25 minutes and let cool"},
-{"key":8, "loc":"175 570", "text":"Cut into rectangular grid"},
-{"key":-2, "category":"End", "loc":"175 640", "text":"Enjoy!"}
+{"key":-1, "category":"Start", "loc":"-146.99999999999986 156", "text":"Start"},
+{"key":0, "loc":"38 219", "text":"Action 3"},
+{"key":1, "loc":"40 95.00000000000003", "text":"Action 1"},
+{"key":5, "loc":"36.99999999999994 156", "text":"Action 2"},
+{"category":"End", "text":"End", "key":-4, "loc":"362.8046875 157"},
+{"text":"Action 4", "key":-2, "loc":"196.8046875 157"}
  ],
   "linkDataArray": [
-{"from":1, "to":2, "fromPort":"B", "toPort":"T"},
-{"from":2, "to":3, "fromPort":"B", "toPort":"T"},
-{"from":3, "to":4, "fromPort":"B", "toPort":"T"},
-{"from":4, "to":6, "fromPort":"B", "toPort":"T"},
-{"from":6, "to":7, "fromPort":"B", "toPort":"T"},
-{"from":7, "to":8, "fromPort":"B", "toPort":"T"},
-{"from":8, "to":-2, "fromPort":"B", "toPort":"T"},
-{"from":-1, "to":0, "fromPort":"B", "toPort":"T"},
-{"from":-1, "to":1, "fromPort":"B", "toPort":"T"},
-{"from":-1, "to":5, "fromPort":"B", "toPort":"T"},
-{"from":5, "to":4, "fromPort":"B", "toPort":"T"},
-{"from":0, "to":4, "fromPort":"B", "toPort":"T"}
+{"from":-1, "to":0, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-60.82109744049782,156,-60.82109744049782,219,-9.415534973144531,219,0.5844650268554688,219]},
+{"from":-1, "to":1, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-59.82109744049782,156,-59.82109744049782,95.00000000000003,-7.415534973144531,95.00000000000003,2.5844650268554688,95.00000000000003]},
+{"from":-1, "to":5, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-61.32109744049785,156,-61.32109744049785,156,-10.415534973144588,156,-0.4155349731445881,156]},
+{"from":1, "to":-2, "fromPort":"R", "toPort":"L", "points":[77.41553497314453,95.00000000000003,87.41553497314453,95.00000000000003,118.40234375,95.00000000000003,118.40234375,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":5, "to":-2, "fromPort":"R", "toPort":"L", "points":[74.41553497314447,156,84.41553497314447,156,116.90234374999997,156,116.90234374999997,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":0, "to":-2, "fromPort":"R", "toPort":"L", "points":[75.41553497314453,219,85.41553497314453,219,117.40234375,219,117.40234375,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":-2, "to":-4, "fromPort":"R", "toPort":"L", "points":[234.22022247314453,157,244.22022247314453,157,288.20144045630167,157,288.20144045630167,157,332.1826584394588,157,342.1826584394588,157]}
  ]}
   </textarea>
 

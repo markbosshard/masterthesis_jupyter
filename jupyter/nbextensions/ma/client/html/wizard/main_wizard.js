@@ -118,7 +118,14 @@ require([
           $(".ms-body .dropable .action-item:visible").each(function(index) {
             $(".acont").append($(this));
           });
+
+          /* load the flowchart */
+          $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
+              console.log("finish loading and running test.js. with a status of");
+              initMe();
+          });
         }
+
         return true;
 
       case 2:
@@ -146,13 +153,21 @@ require([
             builder.popup.Warning('Please create at least one assignment', 'fa-exclamation');
             return false;
           }
+
+          if (!checkDiagramCompleteness()) {
+             builder.popup.Warning('Not all Assignments are reachable from the Start! Reconfigure the diagram, please.', 'fa-exclamation');
+             return false;
+
+          }
+
+          /*** we require no more email when creating the project
           for(x in g_projobj.bundles){
             if(!helper.validateEmail(g_projobj.bundles[x]['owner'])){
               var n = (parseInt(x)+1)
               builder.popup.Warning('Enter a valid email address for assignment ' + n, 'fa-exclamation');
               return false;
             }
-          }
+          } ***/
 
         }
 
@@ -372,7 +387,7 @@ var next = $('<div/>').append(
 
 
 
-      /**
+            /**
         * HTML content for step 4:
         * - Step Description
         * - Note Board - Editable <p>
