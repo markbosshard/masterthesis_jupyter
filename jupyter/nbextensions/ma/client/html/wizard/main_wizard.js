@@ -149,34 +149,38 @@ require([
           * - email address in each assignment is valid
           */
 
-        if (newIndex == 4) {
+        if (newIndex == 3) {
           if(($(".step3 .ms-body .acont .action-item").length != 0)){
-            builder.popup.Warning('Please assign all the actions from the queue', 'fa-exclamation');
+            builder.popup.Warning('Please assign all the actions from the queue.', 'fa-exclamation');
             return false;
           }
           for (var x = 0; x < $('.aactions ul').length; x++){
             var tmp = $('.aactions ul')[x];
             if ($(tmp).children().length == 0){
               var n = (parseInt(x)+1)
-              builder.popup.Warning('Please assign at least one action to the empty assignment ' + n, 'fa-exclamation');
+              builder.popup.Warning('Please assign at least one action to all empty assignments (there are)!', 'fa-exclamation');
               return false;
             }
           }
 
           if(g_projobj.bundles.length == 0){
-            builder.popup.Warning('Please create at least one assignment', 'fa-exclamation');
+            builder.popup.Warning('Please create at least one assignment.', 'fa-exclamation');
             return false;
           }
+
+             /* all owners are set the managers ID (current google account) initially; will be changed after the 24h
           for(x in g_projobj.bundles){
-            if(!(g_projobj.bundles[x]['owner']==""))
+            g_projobj.bundles[x]['owner'] = g_projobj['owner'];
+                /*
             {if(!helper.validateEmail(g_projobj.bundles[x]['owner'])){
               var n = (parseInt(x)+1)
               builder.popup.Warning('Enter a valid email address for assignment ' + n, 'fa-exclamation');
               return false;
             }}
-          }
+          } */
+
           if (!checkDiagramCompleteness()) {
-             builder.popup.Warning('Not all Assignments are reachable from the Start! Reconfigure the diagram, please.', 'fa-exclamation');
+             builder.popup.Warning('Not all Assignments are reachable from the Start and/or the End is not connected! Reconfigure the diagram, please.', 'fa-exclamation');
              return false;
 
         }
@@ -195,6 +199,7 @@ require([
           $('#master-wizard-p-' + (newIndex)).html(pre);
         }
         return true;
+
       default:
         return true;
     }
@@ -245,7 +250,7 @@ require([
         /**
           * If project was unsuccessful, show error icon and message.
           */
-        var redirect = $(builder.popup.RedirectWrapper('An error has occured. The project cloud not been created. Please try again.', 'fa-exclamation')).clone().css('display','none');
+        var redirect = $(builder.popup.RedirectWrapper('An error has occured. The project could not been created. Please try again.', 'fa-exclamation')).clone().css('display','none');
         $(redirect).addClass('error');
         $(popup).append(redirect);
         $(redirect).fadeIn(1000);

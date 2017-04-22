@@ -125,8 +125,7 @@
                             margin: 8,
                             maxSize: new go.Size(160, NaN),
                             wrap: go.TextBlock.WrapFit,
-                            editable: true,
-                            name: "MILESTONE_TEXT"
+                            editable: true
                         },
                         new go.Binding("text").makeTwoWay())
                 )
@@ -325,8 +324,8 @@
                     nodeTemp.isSelected = false;
 
                     // for later use: that's how to change an object's color:
-                    var shape = node.findObject("COLOR");
-                    shape.fill = "#1fbba6";
+                    //var shape = node.findObject("COLOR");
+                    //shape.fill = "#1fbba6";
 
             });
 
@@ -338,9 +337,6 @@
                     } else {
                         // for milestones don't allow line breaks in the text
                         part.data.text = part.data.text.replace(/(\r\n|\n|\r)/gm,"");
-                        console.log("hi"+part.data.text);
-                        var text = part.findObject("MILESTONE_TEXT");
-                        console.log(JSON.stringify(text));
                     }
             });
 
@@ -362,15 +358,15 @@
         //determineDepnendencyLevels();
     }  // end init
 
-
-function shapeClicked(e, obj) {
+// function needed for milestones resizing
+    function shapeClicked(e, obj) {
       var node = obj.part;
       if (!node.isSelected) return;
-      e.diagram.startTransaction();
+      e.diagram.startTransaction("change resizeObjectName");
       node.resizeObjectName = obj.name;
       node.removeAdornment("Resizing");
       node.updateAdornments();
-      e.diagram.commitTransaction("changed resizeObjectName");
+      e.diagram.commitTransaction("change resizeObjectName");
     }
 
 // ToDo: Also check for: all nodes MUST HAVE CHILDREN apart from endnode
@@ -378,14 +374,17 @@ function shapeClicked(e, obj) {
     function checkDiagramCompleteness() {
        for (var it = myDiagram.nodes; it.next();) {
                 var node = it.value;
-                if (!(node.findTreeRoot().data.text == "Start")) {
-                    return false;
+                if(node.data.key < 10000) { // exclude milestone elements
+                    console.log(node.findTreeRoot().data.text);
+                    if (!(node.findTreeRoot().data.text == "Start")) {
+                        return false;
+                    }
                 }
         }
         return true;
     }
 
-    /*
+    /* unused development stuff
     var depLevelByKey;
     function determineDepnendencyLevels() {
         depLevelByKey = new Array();
@@ -449,6 +448,13 @@ function shapeClicked(e, obj) {
   } **/
 
     function load() {
+        // get the standard json we use for a newly created flowchart (saved in wizard.html)
         myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
     }
+
+    function exportDiagramJSON() {
+        return myDiagram.model.toJson();
+    }
+
+
 

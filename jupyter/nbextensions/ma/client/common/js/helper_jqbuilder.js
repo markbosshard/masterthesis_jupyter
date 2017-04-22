@@ -357,9 +357,9 @@ define(['exports',
    * @method createAssignmentWrapper
    * @return {Object} returns the Object containing the DOM element
    */
-  var createAssignmentWrapper = function(number){
+  var createAssignmentWrapper = function(number, title){
         return $('<div/>', {class: 'assignment', 'tabindex': 1, id: 'ass'+number}).append(
-                $('<span/>', {text: 'Please change the Assignment name in the diagram by double-clicking! ('+number+')', class: 'stitle', id: 'text'+number}),
+                $('<span/>', {text: title+":", class: 'stitle', id: 'text'+number}),
                 $('<div/>').append(
                     $('<div/>', {style: 'display: table; width: 100%'}).append(
                         $('<i/>', {class: 'fa fa-list'}),
@@ -378,7 +378,7 @@ define(['exports',
   };
 
   exports.createNewAssignmentDetail = function(number){
-    var newAs = createAssignmentWrapper(number);
+    var newAs = createAssignmentWrapper(number, 'Please change the Assignment name in the diagram by double-clicking!');
     $(newAs).addClass('aactive');
     $('#emaildiv').each(function(){
       $(this).hide();
@@ -408,7 +408,7 @@ define(['exports',
 
   exports.changeAssignmentText = function(number, newtext) {
     console.log(newtext);
-    $("#text"+number).replaceWith($('<span/>', {text: newtext+":", class: 'stitle', id: 'text'+number}));
+    $("#text"+number).replaceWith($('<span/>', {text: newtext, class: 'stitle', id: 'text'+number}));
 
   };
 
@@ -435,10 +435,10 @@ define(['exports',
     obj['bundles'] = [];
     $(".step3 .assignment").each(function(index) {
       var bundle = {};
-      bundle['id'] = $(this).find(".atitle").first().text();
+      bundle['id'] = $(this).find(".stitle").first().text();
       bundle['description'] = $(this).find(".adescription").first().val();
       bundle['next'] = $(this).find(".anext").first().val();
-	bundle['owner'] = $(this).find(".ainput").first().val();
+	 bundle['owner'] = gdapi.getCurrentUser().id;//$(this).find('.ainput').first().val(); we are not saving e-mail in this step anymore */
       var bactions = [];
 
       $(this).find('.aactions .action-item').each(function(index) {
@@ -456,6 +456,9 @@ define(['exports',
       });
       bundle['actions'] = bactions;
       obj['bundles'].push(bundle);
+
+      // save the flowchart-JSON next to the bundles
+      obj['flowchartJSON'] = exportDiagramJSON();
 
     });
     return obj;
@@ -506,7 +509,7 @@ define(['exports',
     var ras = $('<div/>');
 
     for (x in jsonobj.bundles){
-      var asw = createAssignmentWrapper();
+      var asw = createAssignmentWrapper('0', jsonobj.bundles[x]['id']);
 
       for (y in jsonobj.bundles[x]['actions']){
         var l = $('<li/>',{class: 'action-item'})
@@ -521,7 +524,8 @@ define(['exports',
       }
       $(asw).find('.adescription').attr('readonly', true).val(jsonobj.bundles[x]['description']);
       $(asw).find('.anext').attr('readonly', true).val(jsonobj.bundles[x]['next']);
-    
+
+      // as a standard we display the owner's mail-address for all assignments
       $(asw).find('.ainput').attr('readonly', true).val(jsonobj.bundles[x]['owner']);
       $(ras).append(asw);
     }
