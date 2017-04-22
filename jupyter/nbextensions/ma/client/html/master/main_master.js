@@ -15,6 +15,7 @@ require([
   'base/js/events',
   'jquery',
   'require',
+	
   'nbextensions/ma/client/common/js/googledrive/gdapi',
   'nbextensions/ma/client/common/js/helper',
   'nbextensions/ma/client/common/js/helper_jqbuilder',
@@ -25,7 +26,9 @@ require([
   utils,
   events,
   $,
+  
   require,
+  
   gdapi,
   dphelper,
   builder
@@ -146,7 +149,8 @@ require([
       /**
         * Creating the management icons
         */
-	var _status = f_mgmt_icon('_status', 'Status', 'fa-align-left', 'http://google.com/',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
+	var _edit = f_mgmt_icon('_edit', 'Edit', 'fa-pencil-square-o', '',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
+	var _save = f_mgmt_icon('_save', 'Save', 'fa-floppy-o','',(gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
       var _merge = f_mgmt_icon('_merge', 'Merge', 'fa-code-fork', '',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
       var _goto =  f_mgmt_icon('_goto', 'Go To', 'fa-arrow-right', '/tree/'+ project['gid']);
       var _notes =  f_mgmt_icon('_notes', 'Notes', 'fa-sticky-note-o', '/edit/'+ project['gid'] + '/shared.txt');
@@ -236,13 +240,44 @@ require([
         $(popup).on('click', 'a:contains("Cancel")', function(){
           $.magnificPopup.close();
         });
-      })
+      });
 
+      /**
+        * edit function */        
+	
+      $(_edit).on('click', '#_edit:not(.disabled)',function(e){
+		   e.preventDefault();
+	     console.log("edit clicked")
+	$('#_edit').remove();
+	$(m).prepend(_save);
+    	$('.ainput').attr('readonly', false);
+  	
+	
+	});
+	/**
+        * save function updates and create / shares new project with all workers and 		manager */  
+	$(_save).on('click', '#_save:not(.disabled)',function(e){
+	e.preventDefault();
+	for (x in project['bundles']){
+	project.bundles[x]['owner']=$('.ainput:eq('+x+')').first().val();
+	console.log(project.bundles[x]['owner']);
+	
+	 
+	
+	}
+	editJson(project);
+	});
+	var editJson=function(obj){
+	//console.log(obj.bundles[x]['owner']);	
+	return obj;
+	}
 
       /**
         * Appending all the icons/buttons to the management toolbar in the right.
         */
-      $(m).append(_status,_goto,_notes, _delete,_merge);
+	
+      $(m).append(_edit,_goto,_notes, _delete,_merge);
+	
       return m;
     }
 

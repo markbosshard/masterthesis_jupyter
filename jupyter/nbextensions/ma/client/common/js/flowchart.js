@@ -16,7 +16,9 @@
                     "LinkDrawn": showLinkLabel,  // this DiagramEvent listener is defined below
                     "LinkRelinked": showLinkLabel,
                     "animationManager.duration": 800, // slightly longer than default (600ms) animation
-                    "undoManager.isEnabled": true  // enable undo & redo
+                    "undoManager.isEnabled": true,  // enable undo & redo
+                    "resizingTool.maxSize": new go.Size(6000, 30), // we need these for the dragable milestone minimum (fix height)
+                    "resizingTool.minSize": new go.Size(60, 30) // we need this for the draggable milestone max (fix height!)
                 });
 
         // when the document is modified, add a "*" to the title and enable the "Save" button
@@ -85,8 +87,9 @@
                 // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
                 $$(go.Panel, "Auto",
                     $$(go.Shape, "Rectangle",
-                        {fill: "#f27935", stroke: null, name: "SHAPE"},
+                        {fill: "#f27935", stroke: null, name: "COLOR" },
                         new go.Binding("figure", "figure")),
+                        new go.Binding("desiredSize", "Osize", go.Size.parse).makeTwoWay(go.Size.stringify),
                     $$(go.TextBlock,
                         {
                             font: "bold 11pt Helvetica, Arial, sans-serif",
@@ -97,16 +100,42 @@
                             editable: true
                         },
                         new go.Binding("text").makeTwoWay())
+
                 ),
                 // four named ports, one on each side:
-                makePort("T", go.Spot.Top, false, true),
-                makePort("L", go.Spot.Left, true, true),
-                makePort("R", go.Spot.Right, true, true),
-                makePort("B", go.Spot.Bottom, true, false)
+                //makePort("T", go.Spot.Top, false, true),
+                makePort("L", go.Spot.Left, false, true),
+                makePort("R", go.Spot.Right, true, false)
+                //makePort("B", go.Spot.Bottom, true, false)
             ));
 
+        myDiagram.nodeTemplateMap.add("Milestone",  // the default category
+            $$(go.Node, "Spot", nodeStyle(), {resizable: true, resizeObjectName: "R", movable: true, maxLocation: new go.Point(Infinity, NaN), minLocation: new go.Point(-Infinity, NaN)},
+                // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
+                $$(go.Panel, "Auto",
+                    $$(go.Shape, "Rectangle",
+                        {fill: "#dbe1e8", stroke: null, name: "SHAPE", click: shapeClicked,
+                        },
+                        new go.Binding("figure", "figure")),
+                        new go.Binding("desiredSize", "Osize", go.Size.parse).makeTwoWay(go.Size.stringify),
+                    $$(go.TextBlock,
+                        {
+                            font: "bold 11pt Helvetica, Arial, sans-serif",
+                            stroke: "black",
+                            margin: 8,
+                            maxSize: new go.Size(160, NaN),
+                            wrap: go.TextBlock.WrapFit,
+                            editable: true,
+                            name: "MILESTONE_TEXT"
+                        },
+                        new go.Binding("text").makeTwoWay())
+                )
+            ));
+
+
+
         myDiagram.nodeTemplateMap.add("End",
-            $$(go.Node, "Spot", nodeStyle(),
+            $$(go.Node, "Spot", nodeStyle(), {movable: true, maxLocation: new go.Point(Infinity, NaN), minLocation: new go.Point(-Infinity, NaN)},
                 $$(go.Panel, "Auto",
                     $$(go.Shape, "Circle",
                         {minSize: new go.Size(40, 40), fill: "#DC3C00", stroke: null}),
@@ -115,14 +144,12 @@
                         new go.Binding("text"))
                 ),
                 // three named ports, one on each side except the bottom, all input only:
-                makePort("T", go.Spot.Top, false, true),
-                makePort("L", go.Spot.Left, false, true),
-                makePort("R", go.Spot.Right, false, true)
+                makePort("L", go.Spot.Left, false, true)
             ));
 
 
         myDiagram.nodeTemplateMap.add("Start",
-            $$(go.Node, "Spot", nodeStyle(),
+            $$(go.Node, "Spot", nodeStyle(), {movable: false},
                 $$(go.Panel, "Auto",
                     $$(go.Shape, "Circle",
                         {minSize: new go.Size(40, 40), fill: "#79C900", stroke: null}),
@@ -131,9 +158,7 @@
                         new go.Binding("text"))
                 ),
                 // three named ports, one on each side except the top, all output only:
-                makePort("L", go.Spot.Left, true, false),
-                makePort("R", go.Spot.Right, true, false),
-                makePort("B", go.Spot.Bottom, true, false)
+                makePort("R", go.Spot.Right, true, false)
             ));
 
 
@@ -233,13 +258,13 @@
                     var part = e.subject.part;
 
                     //find the active element & hide it when  arrow or start/end clicked
-                    if ((part instanceof go.Link) || (part.data.text == "Start") || (part.data.text == "End")) {
+                    if ((part instanceof go.Link) || (part.data.key > 10000) || (part.data.text == "Start") || (part.data.text == "End")) {
                         builder.deactivateAssignmentDetail();
                     }
 
                     // when a part is clicked: 1) deactivate any active assignment
                     // 2) create a new assignment or just show the old assignment depending on whether we created it before
-                    if (!(part instanceof go.Link) && !(part.data.text == "Start") && !(part.data.text == "End"))  {
+                    if (!(part instanceof go.Link) && !(part.data.key > 10000) && !(part.data.text == "Start") && !(part.data.text == "End"))  {
                         builder.deactivateAssignmentDetail();
                         if(assignmentDetails.indexOf(part.data.key+100)<0) {
                             // the framework generates negative numbers so we add 100
@@ -300,11 +325,24 @@
                     nodeTemp.isSelected = false;
 
                     // for later use: that's how to change an object's color:
-                    //var shape = node.findObject("SHAPE");
-                    //shape.fill = "#1fbba6";
+                    var shape = node.findObject("COLOR");
+                    shape.fill = "#1fbba6";
 
             });
 
+            myDiagram.addDiagramListener("TextEdited",
+                function (e) {
+                    var part = e.subject.part;
+                    if (part.data.key < 10000) { // otherwise it's a milestone
+                        builder.changeAssignmentText(part.data.key + 100, part.data.text);
+                    } else {
+                        // for milestones don't allow line breaks in the text
+                        part.data.text = part.data.text.replace(/(\r\n|\n|\r)/gm,"");
+                        console.log("hi"+part.data.text);
+                        var text = part.findObject("MILESTONE_TEXT");
+                        console.log(JSON.stringify(text));
+                    }
+            });
 
         });
 
@@ -321,23 +359,78 @@
         div2.style.height = '42px'
         myPalette.requestUpdate(); // Needed!
 
+        //determineDepnendencyLevels();
     }  // end init
 
 
-
+function shapeClicked(e, obj) {
+      var node = obj.part;
+      if (!node.isSelected) return;
+      e.diagram.startTransaction();
+      node.resizeObjectName = obj.name;
+      node.removeAdornment("Resizing");
+      node.updateAdornments();
+      e.diagram.commitTransaction("changed resizeObjectName");
+    }
 
 // ToDo: Also check for: all nodes MUST HAVE CHILDREN apart from endnode
 // http://gojs.net/latest/api/symbols/Node.html#findTreeParentNode
     function checkDiagramCompleteness() {
        for (var it = myDiagram.nodes; it.next();) {
                 var node = it.value;
-                console.log(node.findTreeRoot().data.text);
                 if (!(node.findTreeRoot().data.text == "Start")) {
                     return false;
                 }
         }
         return true;
     }
+
+    /*
+    var depLevelByKey;
+    function determineDepnendencyLevels() {
+        depLevelByKey = new Array();
+       parentNodes = new Array();
+       nodesByKey = new Array();
+       for (var it = myDiagram.nodes; it.next();) {
+           // add all nodes into one array
+           nodesByKey[it.value.data.key+100] = it.value;
+
+           // add the start node's dependency level
+           if (it.value.data.text == "Start") {
+               var startNodeKey = it.value.data.key+100;
+               parentNodes[0] = it.value;
+           }
+        }
+
+        findAllChildrenFromManyParents(parentNodes);
+
+        //childNodes = find all children
+           //parentChain = find the childrens parent chain
+           //if parentChain contains childNodes.node, remove these nodes!
+           //label the children
+           //do again starting from all children!
+    }
+
+
+    function findAllChildrenFromManyParents(parentNodes) {
+        var treeChildrenNodes = new Array();
+
+        // get a vector with all child nodes
+       for (var it = parentNodes.findNodesConnected("r"); it.next();) {
+            treeChildrenNodes.push(it.value.data.key);
+       }
+
+       // in that vector take away children that are contained in the parent chain
+       for (var it = parentNodes.findNodesConnected("r")); it.next();) {
+           for (var it2 = it.value.findTreeParentChain(); it.next();) {
+               if (treeChildrenNodes.indexof(it2.value.key) >= 0) {
+                   treeChildrenNodes.remove(it2.value.key);
+               }
+           }
+       }
+
+       console.log(treeChildrenNodes);
+    } */
 
     // Make all ports on a node visible when the mouse is over the node
     function showPorts(node, show) {

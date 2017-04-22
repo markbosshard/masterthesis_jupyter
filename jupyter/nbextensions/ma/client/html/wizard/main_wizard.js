@@ -13,6 +13,8 @@ require([
   'jquery',
   'require',
   'nbextensions/gdrive/gapiutils',
+
+  'nbextensions/ma/client/common/js/gmail/gmailapi',
   'nbextensions/ma/client/common/js/googledrive/gdapi',
   'nbextensions/ma/client/common/js/helper',
   'nbextensions/ma/client/html/wizard/accordion.js',
@@ -29,6 +31,7 @@ require([
   $,
   require,
   gapiutils,
+	gmailapi,
   gdapi,
   helper,
   accordion_helper,
@@ -57,7 +60,17 @@ require([
     */
   var g_projactions = {};
 
-
+	var f_mgmt_icon = function(id,label,iconclass,link){
+        return $('<div/>').append(
+            $('<span/>', { text: label}),
+            $('<span/>', {'id': id, class: 'fa-stack fa-3x '}).append(
+              $('<a/>',  {target: "_blank", href: link}).append(
+                
+                $('<i/>', {class : "fa fa-stack-1x "+ iconclass})
+              )
+            )
+          );
+      }
   /**
    * Helper method responsible for the transitions between the wizard steps
    * and to perform the validation of inputs.
@@ -74,7 +87,7 @@ require([
       */
 
     g_projobj = builder.project.createJSON(g_projobj);
-
+	
     /**
       * Set owner of project
       */
@@ -113,6 +126,7 @@ require([
          * to the action queue.
          */
         if (newIndex == 2) {
+	
           /* Add all the previously added actions in the actions placeholder */
 
           $(".ms-body .dropable .action-item:visible").each(function(index) {
@@ -121,10 +135,9 @@ require([
 
           /* load the flowchart */
           $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
-              console.log("finish loading and running test.js. with a status of");
               initMe();
           });
-        }
+         }
 
         return true;
 
@@ -135,7 +148,8 @@ require([
           * - we have at least one assignment and all assignments are unempty
           * - email address in each assignment is valid
           */
-        if (newIndex == 3) {
+
+        if (newIndex == 4) {
           if(($(".step3 .ms-body .acont .action-item").length != 0)){
             builder.popup.Warning('Please assign all the actions from the queue', 'fa-exclamation');
             return false;
@@ -144,7 +158,7 @@ require([
             var tmp = $('.aactions ul')[x];
             if ($(tmp).children().length == 0){
               var n = (parseInt(x)+1)
-              builder.popup.Warning('Please assing at least one action to the empty assignment ' + n, 'fa-exclamation');
+              builder.popup.Warning('Please assign at least one action to the empty assignment ' + n, 'fa-exclamation');
               return false;
             }
           }
@@ -153,21 +167,19 @@ require([
             builder.popup.Warning('Please create at least one assignment', 'fa-exclamation');
             return false;
           }
-
+          for(x in g_projobj.bundles){
+            if(!(g_projobj.bundles[x]['owner']==""))
+            {if(!helper.validateEmail(g_projobj.bundles[x]['owner'])){
+              var n = (parseInt(x)+1)
+              builder.popup.Warning('Enter a valid email address for assignment ' + n, 'fa-exclamation');
+              return false;
+            }}
+          }
           if (!checkDiagramCompleteness()) {
              builder.popup.Warning('Not all Assignments are reachable from the Start! Reconfigure the diagram, please.', 'fa-exclamation');
              return false;
 
-          }
-
-          /*** we require no more email when creating the project
-          for(x in g_projobj.bundles){
-            if(!helper.validateEmail(g_projobj.bundles[x]['owner'])){
-              var n = (parseInt(x)+1)
-              builder.popup.Warning('Enter a valid email address for assignment ' + n, 'fa-exclamation');
-              return false;
-            }
-          } ***/
+        }
 
         }
 
@@ -177,7 +189,6 @@ require([
           * show the project summary / overview.
           */
         g_projobj['variables'] = $('#p_variables').html();
-        console.log(g_projobj);
 
         if(newIndex == 4){
           var pre = builder.project.display(g_projobj);
@@ -342,16 +353,37 @@ var next = $('<div/>').append(
       /**
         * Initiatie step 2 with content.
         */
-
-      var c2 = $('<div/>', {class: 'stepcontent'}).append(dms_2)
-
+	var email_resp=$('<input/>', {id: 'email_resp', class:'owner', placeholder: 'Owner Email Address(es) [separate by semicolas]'});
+	var c2 = $('<div/>', {class: 'stepcontent'}).append(dms_2);
+	var c2w = $('<div/>').append(
+        f_mgmt_icon('_generate', 'Generate Questionnaire', 'fa-cog', ''),$('<div/>',{ id:'Q_link'}),email_resp,f_mgmt_icon('_send', 'Send', 'fa-paper-plane', ''));
 
       $("#master-wizard").steps('add', {
         title: "Add Actions",
-        content: [builder.wizard.step_decription(s2dt), c2]
+        content: [builder.wizard.step_decription(s2dt), c2, c2w]
       });
+	var actions=[]; 
+	var Subject="Congratulations!!! for your new assignment";
+	var Body="Hello, You have been selected to play a role of worker in Collaborative Data Analysis. You will Shortly receive the workpackage as a shared Google drive folder from our Data Scientist. You can communicate with him using the respective email id. Thank you!."  
+	$('#_generate').on('click',function(e){
+	e.preventDefault();
+	 for (var x = 0; x < $('.dropable ul li').length; x++){
+        var tmp = $('.dropable ul li:eq('+x+')').text();
+      	actions[x]=tmp;	
+	gdapi.initScript();
+	}
+	console.log(actions);
+	});
+	$('#_send').on('click',function(e){
+	e.preventDefault();
+	gmailapi.send_mail($('#email_resp').first().val(),Subject,Body);
+	console.log($('#email_resp').first().val());
+	
+	});
 
 
+     	
+     
       /**
         * HTML content for step 3:
         * - Step Description
@@ -387,7 +419,7 @@ var next = $('<div/>').append(
 
 
 
-            /**
+      /**
         * HTML content for step 4:
         * - Step Description
         * - Note Board - Editable <p>

@@ -87,6 +87,7 @@ define([
         $(".acont").append($(this));
       });
 
+
     }
 
     if (currentIndex == 2 && newIndex == 3) {
@@ -109,11 +110,13 @@ define([
         return false;
       }
       for(x in g_projobj.bundles){
+	
         if(!helper.validateEmail(g_projobj.bundles[x]['owner'])){
           var n = (parseInt(x)+1)
           builder.popup.Warning('Enter a valid email address for assignment ' + n, 'fa-exclamation');
           return false;
         }
+	
       }
 
     }
@@ -121,6 +124,7 @@ define([
 
     if(currentIndex == 3){
         g_projobj['variables'] = $('#p_variables').html();
+        console.log(g_projobj);
     }
 
     if (newIndex == 4) {
@@ -306,7 +310,6 @@ define([
       */
     gdapi.init.then(
       function(res){
-          alert("hdll");
         /**
           *  Is Google API loaded, Initialize the wizard object
           */
@@ -315,8 +318,8 @@ define([
         /**
           * Initialize the wizard steps
           */
-        initWizardSteps();
 
+        initWizardSteps();
       }, function(err){
         console.log(err);
       }

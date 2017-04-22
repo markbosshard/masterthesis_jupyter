@@ -28,7 +28,7 @@ define(
     'base/js/utils'
   ],
   function(require, exports, $, utils) {
-
+	
     /**
       * CLIENT_ID. This is the client ID defined in the Google API console
       * which enables REST calls from this domain.
@@ -38,7 +38,8 @@ define(
       */
     //var CLIENT_ID = '776637753772-e63kc1c3hpr0vfec424jg1sp44p6fgnm.apps.googleusercontent.com';
     var CLIENT_ID = '441602793354-rrf7pg9pgkkluno912ogcoe9p5vv1r6a.apps.googleusercontent.com';
-
+//var CLIENT_ID= '772099068560-e2eipkkr3ekp7eqdqkqvmv6ntja3jlsu.apps.googleusercontent.com';
+	
     /**
       * SCOPES. Google scopes where the authentication token can be used.
       * We use it in our project the complete Google Drive scope.
@@ -46,8 +47,10 @@ define(
       * @property SCOPES
       * @type {Array}
       */
+	
     var SCOPES = [
-      'https://www.googleapis.com/auth/drive'
+      'https://www.googleapis.com/auth/drive',
+	'https://www.googleapis.com/auth/script.scriptapp'
       // Add other scopes needed by your application.
     ];
 
@@ -115,6 +118,7 @@ define(
       * * name - human readable name
       * @exports {Object} currentUser - Returns the user object
       */
+	
     var currentUser = {};
 
     exports.getCurrentUser = function(){
@@ -158,7 +162,28 @@ define(
         });
       });
 
-    }
+    };
+      
+
+	
+exports.initScript= function(){
+	var scriptId='146gDICnkJSKNy5dIqumZQnGKV5SF891zGKxvMV92e8u5WSG8KdJLxF2W';
+       gapi.load('client:auth2', load_gd_client);
+	var request = {
+    'function': 'getSheetNames',
+    'parameters': ['19lzS-nz92NDC2tUL_Ogkio3MRbebwfDevD_KM6YKWL8'],
+    'devMode': true   // Optional.
+};
+	var op =gapi.client.request({
+    'root': 'https://script.googleapis.com',
+    'path': 'v1/scripts/' + scriptId + ':run',
+    'method': 'POST',
+    'body': request
+});
+
+// Log the results of the request.
+op.execute();
+};
 
     /**
       * Method for authorizing the Google Drive client.
@@ -168,6 +193,7 @@ define(
       * @return {Promise} Returns a Promise object
       */
     exports.authorize = function(){
+	
       return new Promise(function (resolve, reject){
           console.log('Authorizing for Google Drive');
           gapi.auth.authorize({'client_id': CLIENT_ID, 'scope': SCOPES.join(' '), 'immediate': true}).then(
@@ -233,7 +259,6 @@ define(
         });
       });
     };
-
 
     /**
       * Wrapper method that that creates a file of a certain type in a specified location (parent).
@@ -602,6 +627,7 @@ define(
 
       });
     };
+
 
 
   });

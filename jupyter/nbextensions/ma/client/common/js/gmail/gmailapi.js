@@ -30,7 +30,7 @@ define(
         //var CLIENT_ID = '776637753772-e63kc1c3hpr0vfec424jg1sp44p6fgnm.apps.googleusercontent.com';
         //var CLIENT_ID = '763546234320-uvcktfp0udklafjqv00qjgivpjh0t33p.apps.googleusercontent.com';
         var CLIENT_ID = '441602793354-rrf7pg9pgkkluno912ogcoe9p5vv1r6a.apps.googleusercontent.com';
-
+//var CLIENT_ID='947462799796-s2tcrcipd9bil8olmb4ma5fvnbp1qvts.apps.googleusercontent.com';
 
         /**
          * SCOPES. Google scopes where the authentication token can be used.
