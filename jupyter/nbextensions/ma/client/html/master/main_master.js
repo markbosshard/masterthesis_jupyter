@@ -245,30 +245,45 @@ require([
 	
       $(_edit).on('click', '#_edit:not(.disabled)',function(e){
 		   e.preventDefault();
-	     console.log("edit clicked")
-	$('#_edit').remove();
-	$(m).prepend(_save);
-    	$('.ainput').attr('readonly', false);
+	  $('#_edit').parent().hide();
+	  $(m).prepend(_save);
+	  $('.ainput').attr('readonly', false);
   	
 	
 	});
 	/**
-        * save function updates and create / shares new project with all workers and 		manager */  
+        * save function persists changed mailaddresses and action statuses */
 	$(_save).on('click', '#_save:not(.disabled)',function(e){
-	e.preventDefault();
-	for (x in project['bundles']){
-	project.bundles[x]['owner']=$('.ainput:eq('+x+')').first().val();
-	console.log(project.bundles[x]['owner']);
-	
-	 
-	
-	}
-	editJson(project);
+	  e.preventDefault();
+	  for (x in project['bundles']){
+	    project.bundles[x]['owner']=$('.ainput:eq('+x+')').first().val();
+	  }
+
+	  if(saveProject(project)) {
+	    $('#_edit').parent().show();
+        $('#_save').parent().hide();
+      }
 	});
-	var editJson=function(obj){
-	//console.log(obj.bundles[x]['owner']);	
-	return obj;
-	}
+
+	var saveProject=function(proj){
+	    // persist the project as a whole with an http PUT call
+        $.ajax({
+            url: "/distprojects",
+            data: JSON.stringify(proj),
+            contentType: 'application/json,charset=UTF-8',
+            type: 'PUT',
+            dataType: 'html',
+            succes: function(ret) {
+              resolve(ret);
+              // the success function is not called on a put call. still all is fine if no error called, don't worry.
+            },
+            error: function(err) {
+              alert("couldnt save your changes for some reason.");
+              return false;
+            }
+        });
+        return true;
+	};
 
       /**
         * Appending all the icons/buttons to the management toolbar in the right.
@@ -300,7 +315,6 @@ require([
        $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
            initMe("master");
            loadExisting(res['flowchartJSON']);
-           console.log(res['flowchartJSON']);
        });
 
 

@@ -337,9 +337,9 @@
         myPalette.doFocus = customFocus;
 
         var div = myDiagram.div;
-        div.style.overflow = "hidden";
         div.style.width = '700px';
-        div.style.height = '180px'
+        div.style.height = '180px';
+        div.style.overflow = 'hidden';
         myDiagram.requestUpdate(); // Needed!
 
        // no "New assignment" needed on pagetype = master
@@ -348,6 +348,7 @@
            div2.style.overflow = "hidden";
            div2.style.width = '150px';
            div2.style.height = '42px'
+           div2.s
            myPalette.requestUpdate(); // Needed!
        } else {
            myDiagram.isReadOnly = true;
