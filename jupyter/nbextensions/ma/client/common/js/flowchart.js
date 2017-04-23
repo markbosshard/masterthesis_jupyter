@@ -4,7 +4,7 @@
 
     var myDiagram;
 
-   function initMe() {
+   function initMe(pageType) {
         if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
         var $$ = go.GraphObject.make;  // for conciseness in defining templates
 
@@ -89,7 +89,6 @@
                     $$(go.Shape, "Rectangle",
                         {fill: "#f27935", stroke: null, name: "COLOR" },
                         new go.Binding("figure", "figure")),
-                        new go.Binding("desiredSize", "Osize", go.Size.parse).makeTwoWay(go.Size.stringify),
                     $$(go.TextBlock,
                         {
                             font: "bold 11pt Helvetica, Arial, sans-serif",
@@ -116,8 +115,8 @@
                     $$(go.Shape, "Rectangle",
                         {fill: "#dbe1e8", stroke: null, name: "SHAPE", click: shapeClicked,
                         },
-                        new go.Binding("figure", "figure")),
                         new go.Binding("desiredSize", "Osize", go.Size.parse).makeTwoWay(go.Size.stringify),
+                        new go.Binding("figure", "figure")),
                     $$(go.TextBlock,
                         {
                             font: "bold 11pt Helvetica, Arial, sans-serif",
@@ -215,8 +214,6 @@
         myDiagram.toolManager.relinkingTool.temporaryLink.routing = go.Link.Orthogonal;
 
 
-        load();  // load an initial diagram from some JSON text
-
         // initialize the Palette that is on the left side of the page
         myPalette =
             $$(go.Palette, "flowchartSelector",  // must name or refer to the DIV HTML element
@@ -265,13 +262,7 @@
                     // 2) create a new assignment or just show the old assignment depending on whether we created it before
                     if (!(part instanceof go.Link) && !(part.data.key > 10000) && !(part.data.text == "Start") && !(part.data.text == "End"))  {
                         builder.deactivateAssignmentDetail();
-                        if(assignmentDetails.indexOf(part.data.key+100)<0) {
-                            // the framework generates negative numbers so we add 100
-                            builder.createNewAssignmentDetail(part.data.key+100);
-                            assignmentDetails.push(part.data.key+100);
-                        } else {
-                            builder.activateAssignmentDetail(part.data.key+100);
-                        }
+                        builder.activateAssignmentDetail(part.data.key+100);
                     }
                 });
 
@@ -346,14 +337,21 @@
         myPalette.doFocus = customFocus;
 
         var div = myDiagram.div;
-        div.style.width = '800px';
-        div.style.height = '250px'
+        div.style.overflow = "hidden";
+        div.style.width = '700px';
+        div.style.height = '180px'
         myDiagram.requestUpdate(); // Needed!
 
-        var div2 = myPalette.div;
-        div2.style.width = '150px';
-        div2.style.height = '42px'
-        myPalette.requestUpdate(); // Needed!
+       // no "New assignment" needed on pagetype = master
+       if (pageType == "wizard") {
+           var div2 = myPalette.div;
+           div2.style.overflow = "hidden";
+           div2.style.width = '150px';
+           div2.style.height = '42px'
+           myPalette.requestUpdate(); // Needed!
+       } else {
+           myDiagram.isReadOnly = true;
+       }
 
         //determineDepnendencyLevels();
     }  // end init
@@ -447,9 +445,13 @@
     myDiagram.isModified = false;
   } **/
 
-    function load() {
+    function loadInitial() {
         // get the standard json we use for a newly created flowchart (saved in wizard.html)
         myDiagram.model = go.Model.fromJson(document.getElementById("mySavedModel").value);
+    }
+
+    function loadExisting(modelJSON) {
+         myDiagram.model = go.Model.fromJson(modelJSON);
     }
 
     function exportDiagramJSON() {

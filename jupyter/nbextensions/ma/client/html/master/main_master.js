@@ -33,8 +33,6 @@ require([
   dphelper,
   builder
 ) {
-  console.log('Entered main_master.js of ma_distproject extension');
-
   /**
    * Main method responsible for loading and displaying the projects
    * @method init_projects
@@ -293,7 +291,19 @@ require([
         * Calling helper method to display the project
         */
       $('.pr').html(builder.project.display(res));
+      builder.deactivateAssignmentDetail();
       $('.pr').append(mgmt_toolbar(res));
+
+      // create a flowchart div here, load flowchart code here with getscript
+       $('.pr').find('.split').first().before($('<div id="flowchartSelector" style="overflow: hidden;"></div>'));
+       $('.pr').find('.split').first().before($('<div id="flowchartPane" style="overflow: hidden;"></div>'));
+       $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
+           initMe("master");
+           loadExisting(res['flowchartJSON']);
+           console.log(res['flowchartJSON']);
+       });
+
+
       var a_wrp = $('<div class="fw activities"></div>');
       var activities = $('<div class="fw-value"></div>');
       $(activities).addClass('overflow150');

@@ -135,7 +135,8 @@ require([
 
           /* load the flowchart */
           $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
-              initMe();
+              initMe("wizard");
+              loadInitial();
           });
          }
 

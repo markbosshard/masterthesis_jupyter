@@ -337,7 +337,7 @@ define(['exports',
 
   exports.wizard.assignmentContainer = function() {
     var arr = $('<div/>', {id: 'flowchartHolder'});
-    var flowchartPane = $('<div/>', {id: 'flowchartPane'});
+    var flowchartPane = $('<div/>', {id: 'flowchartPane', style: "overflow: hidden;"});
     var flowchartSelector = $('<div/>', {id: 'flowchartSelector'});
         var milestoneFlowchart = $('<div/>', {id: 'milestonFlowchart'});
 
@@ -358,8 +358,8 @@ define(['exports',
    * @return {Object} returns the Object containing the DOM element
    */
   var createAssignmentWrapper = function(number, title){
-        return $('<div/>', {class: 'assignment', 'tabindex': 1, id: 'ass'+number}).append(
-                $('<span/>', {text: title+":", class: 'stitle', id: 'text'+number}),
+        return $('<div/>', {class: 'assignment aactive', 'tabindex': 1, id: number}).append(
+                $('<span/>', {text: title, class: 'stitle', id: 'text'+number}),
                 $('<div/>').append(
                     $('<div/>', {style: 'display: table; width: 100%'}).append(
                         $('<i/>', {class: 'fa fa-list'}),
@@ -378,7 +378,7 @@ define(['exports',
   };
 
   exports.createNewAssignmentDetail = function(number){
-    var newAs = createAssignmentWrapper(number, 'Please change the Assignment name in the diagram by double-clicking!');
+    var newAs = createAssignmentWrapper('ass'+number, 'Please change the Assignment name in the diagram by double-clicking!');
     $(newAs).addClass('aactive');
     $('#emaildiv').each(function(){
       $(this).hide();
@@ -408,7 +408,7 @@ define(['exports',
 
   exports.changeAssignmentText = function(number, newtext) {
     console.log(newtext);
-    $("#text"+number).replaceWith($('<span/>', {text: newtext, class: 'stitle', id: 'text'+number}));
+    $("#textass"+number).replaceWith($('<span/>', {text: newtext+":", class: 'stitle', id: 'textass'+number}));
 
   };
 
@@ -435,14 +435,17 @@ define(['exports',
     obj['bundles'] = [];
     $(".step3 .assignment").each(function(index) {
       var bundle = {};
+      console.log(this.id);
+      bundle['flowchartID'] = this.id;
       bundle['id'] = $(this).find(".stitle").first().text();
       bundle['description'] = $(this).find(".adescription").first().val();
       bundle['next'] = $(this).find(".anext").first().val();
-	 bundle['owner'] = gdapi.getCurrentUser().id;//$(this).find('.ainput').first().val(); we are not saving e-mail in this step anymore */
+	  bundle['owner'] = gdapi.getCurrentUser().id;//$(this).find('.ainput').first().val();
+      // we are not saving e-mail addresses in this step anymore, all is just created in the manager's GoogDrive */
+
       var bactions = [];
 
       $(this).find('.aactions .action-item').each(function(index) {
-        console.log($(this).attr('nid'));
         var baction = {};
         baction['id'] = $(this).attr('nid');
         baction['name'] = g_projactions[$(this).attr('nid')]['name'];
@@ -509,7 +512,7 @@ define(['exports',
     var ras = $('<div/>');
 
     for (x in jsonobj.bundles){
-      var asw = createAssignmentWrapper('0', jsonobj.bundles[x]['id']);
+      var asw = createAssignmentWrapper(jsonobj.bundles[x]['flowchartID'], jsonobj.bundles[x]['id']);
 
       for (y in jsonobj.bundles[x]['actions']){
         var l = $('<li/>',{class: 'action-item'})
