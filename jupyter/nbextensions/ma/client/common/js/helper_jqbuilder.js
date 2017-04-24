@@ -369,12 +369,26 @@ define(['exports',
                         $('<i/>', {class: 'fa fa-sticky-note', style: 'vertical-align: top; padding: 10px 1em'}),
                         $('<textarea/>', {class: 'adescription', placeholder: 'Enter assignment description'})
                     ),
+                    $('<div/>', {style: 'display: table; width: 100%; '}).append( // jquery .css("display", "table") for activation later
+                        $('<i/>', {class: 'fa fa-check-square', style: 'display: none;', name: 'statusDropdownSymbol'}),
+                        $('<div/>').append(
+                            $('<select/>', {class: 'span3', name: 'statusDropdown', id: 'statusDropdown_'+number, style: "color: black; display: none;"}).append(
+                                $('<option/>', {disabled: "disabled", selected: 'selected', value: 'New', text: '' }),
+                                $('<option/>', {disabled: "disabled", value: 'Ready', text: 'Ready' }),
+                                $('<option/>', {disabled: "disabled", value: 'In Work', text: 'In Work' }),
+                                $('<option/>', {disabled: "disabled", value: 'Review 1', text: 'Review 1' }),
+                                $('<option/>', {disabled: "disabled", value: 'Rework', text: 'Rework' }),
+                                $('<option/>', {disabled: "disabled", value: 'Review 2', text: 'Review 2' }),
+                                $('<option/>', {disabled: "disabled", value: 'Done', text: 'Done' })
+                            )
+                        )
+                    ),
                     $('<div/>', {style: 'display: table; width: 100%;', id: 'emaildiv'}).append(
                         $('<i/>', {class: 'fa fa-user'}),
                         $('<input/>', {class: 'ainput', name: 'owner', placeholder: 'Owner Email Address'}).attr('autocomplete', 'on')
                     )
-              )
-            );
+                )
+        );
   };
 
   exports.createNewAssignmentDetail = function(number){
@@ -387,7 +401,8 @@ define(['exports',
 
   };
 
-  exports.activateAssignmentDetail = function(number){
+  exports.activateAssignmentDetail = function(number, newcolor){
+    $("#textass"+number).css("background", newcolor)
     $("#ass"+number).show();
     $("#ass"+number).addClass('aactive');
 
@@ -398,18 +413,14 @@ define(['exports',
         $(this).removeClass('aactive');
         $(this).hide();
       });
-
   };
 
   exports.deleteAssignmentDetail = function(number) {
     $("#ass"+number).remove();
-
   };
 
   exports.changeAssignmentText = function(number, newtext) {
-    console.log(newtext);
     $("#textass"+number).replaceWith($('<span/>', {text: newtext+":", class: 'stitle', id: 'textass'+number}));
-
   };
 
 
@@ -435,12 +446,12 @@ define(['exports',
     obj['bundles'] = [];
     $(".step3 .assignment").each(function(index) {
       var bundle = {};
-      console.log(this.id);
       bundle['flowchartID'] = this.id;
       bundle['id'] = $(this).find(".stitle").first().text();
       bundle['description'] = $(this).find(".adescription").first().val();
       bundle['next'] = $(this).find(".anext").first().val();
 	  bundle['owner'] = gdapi.getCurrentUser().id;//$(this).find('.ainput').first().val();
+      bundle['status'] = $("#statusDropdown_" + this.id).find("option[selected='selected']").attr("value");
       // we are not saving e-mail addresses in this step anymore, all is just created in the manager's GoogDrive */
 
       var bactions = [];

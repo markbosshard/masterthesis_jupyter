@@ -325,7 +325,7 @@ span.stitle {
 .mining-step > .assignment.aactive span.stitle {
   text-align: left;
   padding-left: 10px;
-  background: @base-orange;
+  background: @base-blue;
 }
 
 .mining-step .saction {

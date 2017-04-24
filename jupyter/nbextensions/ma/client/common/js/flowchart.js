@@ -87,7 +87,7 @@
                 // the main object is a Panel that surrounds a TextBlock with a rectangular Shape
                 $$(go.Panel, "Auto",
                     $$(go.Shape, "Rectangle",
-                        {fill: "#f27935", stroke: null, name: "COLOR" },
+                        {fill: "#14b9d6", stroke: null, name: "COLOR" },
                         new go.Binding("figure", "figure")),
                     $$(go.TextBlock,
                         {
@@ -150,7 +150,7 @@
             $$(go.Node, "Spot", nodeStyle(), {movable: false},
                 $$(go.Panel, "Auto",
                     $$(go.Shape, "Circle",
-                        {minSize: new go.Size(40, 40), fill: "#79C900", stroke: null}),
+                        {minSize: new go.Size(40, 40), fill: "#1fbba6", stroke: null, name: "COLOR"}),
                     $$(go.TextBlock, "Start",
                         {font: "bold 11pt Helvetica, Arial, sans-serif", stroke: lightText},
                         new go.Binding("text"))
@@ -262,7 +262,7 @@
                     // 2) create a new assignment or just show the old assignment depending on whether we created it before
                     if (!(part instanceof go.Link) && !(part.data.key > 10000) && !(part.data.text == "Start") && !(part.data.text == "End"))  {
                         builder.deactivateAssignmentDetail();
-                        builder.activateAssignmentDetail(part.data.key+100);
+                        builder.activateAssignmentDetail(part.data.key+100, part.findObject("COLOR").fill);
                     }
                 });
 
@@ -277,10 +277,8 @@
                     // find out key of new assignment
                     for (var it = e.diagram.selection.iterator; it.next(); ) {
                         var node = it.value; // part is now a Node or a Group or a Link or maybe a simple Part
-                        console.log(node.data.color);
                         var keyOfNewAssignment = node.data.key;
                     }
-                    console.log(keyOfNewAssignment);
 
                     builder.deleteAssignmentDetail(keyOfNewAssignment+100);
             });
@@ -314,10 +312,6 @@
                     // deselect the node in the palette, that we saved as temp before
                     nodeTemp.isSelected = false;
 
-                    // for later use: that's how to change an object's color:
-                    //var shape = node.findObject("COLOR");
-                    //shape.fill = "#1fbba6";
-
             });
 
             myDiagram.addDiagramListener("TextEdited",
@@ -342,6 +336,7 @@
         div.style.overflow = 'hidden';
         myDiagram.requestUpdate(); // Needed!
 
+
        // no "New assignment" needed on pagetype = master
        if (pageType == "wizard") {
            var div2 = myPalette.div;
@@ -354,7 +349,6 @@
            myDiagram.isReadOnly = true;
        }
 
-        //determineDepnendencyLevels();
     }  // end init
 
 // function needed for milestones resizing
@@ -374,7 +368,6 @@
        for (var it = myDiagram.nodes; it.next();) {
                 var node = it.value;
                 if(node.data.key < 10000) { // exclude milestone elements
-                    console.log(node.findTreeRoot().data.text);
                     if (!(node.findTreeRoot().data.text == "Start")) {
                         return false;
                     }
@@ -383,52 +376,34 @@
         return true;
     }
 
-    /* unused development stuff
-    var depLevelByKey;
-    function determineDepnendencyLevels() {
-        depLevelByKey = new Array();
-       parentNodes = new Array();
-       nodesByKey = new Array();
+    function changeColorByKey(key, newcolor) {
        for (var it = myDiagram.nodes; it.next();) {
-           // add all nodes into one array
-           nodesByKey[it.value.data.key+100] = it.value;
-
-           // add the start node's dependency level
-           if (it.value.data.text == "Start") {
-               var startNodeKey = it.value.data.key+100;
-               parentNodes[0] = it.value;
-           }
-        }
-
-        findAllChildrenFromManyParents(parentNodes);
-
-        //childNodes = find all children
-           //parentChain = find the childrens parent chain
-           //if parentChain contains childNodes.node, remove these nodes!
-           //label the children
-           //do again starting from all children!
+           if (it.value.data.key == (key-100)) {
+               // change an object's color:
+               var shape = it.value.findObject("COLOR");
+               shape.fill = newcolor;
+               return true;
+            }
+       }
     }
 
+    function determineWorkableNode(key) {
+       var numParentsDone = 0;
+       var numParents = 0;
+       for (var it = myDiagram.nodes; it.next();) {
+                var node = it.value;
+                if(node.data.key == (key-100)) { // exclude milestone elements
+                    for (var it2 = node.findNodesInto("L"); it2.next();) {
+                        numParents = numParents + 1;
+                        if (it2.value.findObject("COLOR").fill == "#1fbba6") {
+                            numParentsDone = numParentsDone + 1;
+                        }
+                    }
+                }
+        }
+        return (numParentsDone == numParents);
+    }
 
-    function findAllChildrenFromManyParents(parentNodes) {
-        var treeChildrenNodes = new Array();
-
-        // get a vector with all child nodes
-       for (var it = parentNodes.findNodesConnected("r"); it.next();) {
-            treeChildrenNodes.push(it.value.data.key);
-       }
-
-       // in that vector take away children that are contained in the parent chain
-       for (var it = parentNodes.findNodesConnected("r")); it.next();) {
-           for (var it2 = it.value.findTreeParentChain(); it.next();) {
-               if (treeChildrenNodes.indexof(it2.value.key) >= 0) {
-                   treeChildrenNodes.remove(it2.value.key);
-               }
-           }
-       }
-
-       console.log(treeChildrenNodes);
-    } */
 
     // Make all ports on a node visible when the mouse is over the node
     function showPorts(node, show) {

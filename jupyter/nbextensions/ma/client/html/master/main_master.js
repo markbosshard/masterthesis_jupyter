@@ -147,7 +147,7 @@ require([
       /**
         * Creating the management icons
         */
-	var _edit = f_mgmt_icon('_edit', 'Edit', 'fa-pencil-square-o', '',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
+	var _edit = f_mgmt_icon('_edit', 'Edit Workers', 'fa-pencil-square-o', '',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
 	var _save = f_mgmt_icon('_save', 'Save', 'fa-floppy-o','',(gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
       var _merge = f_mgmt_icon('_merge', 'Merge', 'fa-code-fork', '',   (gdapi.getCurrentUser().id == project['owner'] ? 'enabled' : 'disabled'));
       var _goto =  f_mgmt_icon('_goto', 'Go To', 'fa-arrow-right', '/tree/'+ project['gid']);
@@ -265,7 +265,16 @@ require([
       }
 	});
 
-	var saveProject=function(proj){
+	  /**
+        * Appending all the icons/buttons to the management toolbar in the right.
+        */
+	
+      $(m).append(_edit,_goto,_notes, _delete,_merge);
+	
+      return m;
+    }
+
+    var saveProject=function(proj){
 	    // persist the project as a whole with an http PUT call
         $.ajax({
             url: "/distprojects",
@@ -284,15 +293,6 @@ require([
         });
         return true;
 	};
-
-      /**
-        * Appending all the icons/buttons to the management toolbar in the right.
-        */
-	
-      $(m).append(_edit,_goto,_notes, _delete,_merge);
-	
-      return m;
-    }
 
     /**
       * Method for rendering the project contents. The method will retrieve
@@ -315,8 +315,38 @@ require([
        $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
            initMe("master");
            loadExisting(res['flowchartJSON']);
+
+           // for long flowcharts: hide the scrollbar! pane is still draggable with mouse ("hand")
+          $('#flowchartPane').children().eq(1).css("overflow", "hidden");
+
+          for (x in res['bundles']) {
+              // remove currently selected choice in dropdown & set the one from the project file
+              $("#statusDropdown_" + res.bundles[x]['flowchartID']).find("option[selected='selected']").removeAttr("selected");
+              var dropdownSelection = $("#statusDropdown_" + res.bundles[x]['flowchartID']).find("option[value='"+res.bundles[x]['status']+"']");
+              dropdownSelection.removeAttr("disabled");
+              dropdownSelection.attr("selected", "selected");
+
+
+              // change color in diagram based on current status
+              var flowchartID = res.bundles[x]['flowchartID'].substring(3);
+              if (res.bundles[x]['status'] == "New")  {
+                changeColorByKey(flowchartID, "#14b9d6");
+              } else if (res.bundles[x]['status'] == "Done") {
+                changeColorByKey(flowchartID, "#1fbba6");
+              } else {
+                changeColorByKey(flowchartID, "#f27935");
+              }
+          }
+          determineWorkableNodes(res);
        });
 
+       // unhide all status dropdowns
+       $("i[name='statusDropdownSymbol']").each(function(){
+          $(this).show();
+       });
+       $("select[name='statusDropdown']").each(function(){
+          $(this).show();
+       });
 
       var a_wrp = $('<div class="fw activities"></div>');
       var activities = $('<div class="fw-value"></div>');
@@ -352,6 +382,65 @@ require([
       $(a_wrp).append($('<i class="fw-icon fa fa-lg fa-bullhorn"></i>'), activities);
       $('.pr').find('.split').first().append(a_wrp);
     }
+
+
+    var determineWorkableNodes = function(res) {
+      for (x in res['bundles']) {
+
+          var flowchartID = res.bundles[x]['flowchartID'];
+          // check if node is workable and should be editable
+          if (!(res.bundles[x]['status'] == "Done") && determineWorkableNode(flowchartID.substring(3))) {
+                $("#statusDropdown_" + flowchartID).find("option[value='New']").removeAttr("selected");
+
+                if(res.bundles[x]['status'] == "New") {
+                    $("#statusDropdown_" + flowchartID).find("option[value='Ready']").attr("selected", "selected");
+                } else {
+                    $("#statusDropdown_" + flowchartID).find("option[value='"+res.bundles[x]['status']+"']").attr("selected", "selected");
+                }
+                // make assignment orange: it's ready for work now!
+                changeColorByKey(flowchartID.substring(3), "#f27935");
+                // make dropdown editable
+                $("#statusDropdown_" + res.bundles[x]['flowchartID']).find("option").removeAttr("disabled");
+
+                // listen for changes on dropdown and save them
+                $("#statusDropdown_" + res.bundles[x]['flowchartID']).change(function() {
+                    $( "select option:selected" ).each(function() {
+                      var attrFlowchartID = $( this ).parent().parent().parent().parent().parent().attr("id");
+                      if($(this).text() == "Done") {
+                        if(changeColorByKey(attrFlowchartID.substring(3), "#1fbba6", "changed")){
+                            // save new dropdown status on server
+                            for(y in res['bundles']) {
+                                if(res.bundles[y]['flowchartID'] == attrFlowchartID) {
+                                    res.bundles[y]['status'] = $(this).text();
+                                    saveProject(res);
+                                }
+                            }
+                          // make dropdown fully blocked again
+                          $("#statusDropdown_" + attrFlowchartID).find("option").attr("disabled", "disabled")
+
+                          // make titlebar of assignment green
+                          $("#text"+attrFlowchartID).css("background", "#1fbba6");
+                          determineWorkableNodes(res);
+                        }
+                      } else {
+                          $("#statusDropdown_" + attrFlowchartID).find("option[value='Ready']").attr("disabled", "disabled");
+                          // save new dropdown status on server
+                          for(y in res['bundles']) {
+                                if(res.bundles[y]['flowchartID'] == attrFlowchartID) {
+                                    res.bundles[y]['status'] = $(this).text();
+                                    saveProject(res);
+                                }
+                          }
+                      }
+                    });
+                });
+                // this is down here due to race conditions.. just deactivate the blank dropdownchoice, once the ass. is orange
+                $("#statusDropdown_" + flowchartID).find("option[value='New']").attr("disabled", "disabled");
+            }
+        }
+    }
+
+
 
 
     /**

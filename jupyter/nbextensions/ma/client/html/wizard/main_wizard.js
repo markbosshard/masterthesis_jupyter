@@ -137,6 +137,8 @@ require([
           $.getScript('nbextensions/ma/client/common/js/flowchart.js', function() {
               initMe("wizard");
               loadInitial();
+              // for long flowcharts: hide the scrollbar! pane is still draggable with mouse ("hand")
+              $('#flowchartPane').children().eq(1).css("overflow", "hidden");
           });
          }
 
