@@ -1,0 +1,57 @@
+{% extends "page.html" %} {% block title %}{{page_title}}{% endblock %}
+{% block stylesheet %} {{super()}}
+<script type="text/javascript" charset="utf-8" data-requiremodule="jquery" src="/static/components/jquery/jquery.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/nbextensions/ma/client/common/js/go-watermark.js"></script>
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css"/>
+<!--<link href="/nbextensions/ma/client/dist_project/jqaccordion/jqaccordion.css" rel="stylesheet">-->
+<link href="/nbextensions/ma/client/common/js/jqpopup/magnific-popup.css" rel="stylesheet"/>
+<link href="/nbextensions/ma/client/common/js/dropdown/dropdown.css" rel="stylesheet/less"/>
+
+
+<link href="/nbextensions/ma/client/common/css/dist_project.css" rel="stylesheet/less"/>
+<link href="/nbextensions/ma/client/common/js/jqsteps/jquery.steps.css" rel="stylesheet/less"/>
+<link href="/nbextensions/ma/client/common/js/jqaccordion/plugin.multilevel.accordion.css" rel="stylesheet/less"/>
+
+<script src="/nbextensions/ma/client/common/js/less/less.js" type="text/javascript"></script>
+
+
+{% endblock %}
+{% block params %} data-base-url='{{base_url}}' data-extension-list='{{extension_list}}' {% endblock %}
+{% block headercontainer
+%}
+
+<center>
+  <h2>Create Distributed Project</h2>
+</center>
+
+<div id="master-wizard"></div>
+    <div id = myPaletteDiv></div>
+    <div id = myFlowChart></div>
+    <textarea id="mySavedModel" style="width:100%;height:300px;display:none">{ "class": "go.GraphLinksModel",
+  "linkFromPortIdProperty": "fromPort",
+  "linkToPortIdProperty": "toPort",
+  "nodeDataArray": [
+{"key":-1, "category":"Start", "loc":"-146.99999999999986 156", "text":"Start"},
+{"key":0, "loc":"38 219", "text":"Action 3"},
+{"key":1, "loc":"40 95.00000000000003", "text":"Action 1"},
+{"key":5, "loc":"36.99999999999994 156", "text":"Action 2"},
+{"category":"End", "text":"End", "key":-4, "loc":"362.8046875 157"},
+{"text":"Action 4", "key":-2, "loc":"196.8046875 157"}
+ ],
+  "linkDataArray": [
+{"from":-1, "to":0, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-60.82109744049782,156,-60.82109744049782,219,-9.415534973144531,219,0.5844650268554688,219]},
+{"from":-1, "to":1, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-59.82109744049782,156,-59.82109744049782,95.00000000000003,-7.415534973144531,95.00000000000003,2.5844650268554688,95.00000000000003]},
+{"from":-1, "to":5, "fromPort":"R", "toPort":"L", "points":[-122.22665990785111,156,-112.22665990785111,156,-61.32109744049785,156,-61.32109744049785,156,-10.415534973144588,156,-0.4155349731445881,156]},
+{"from":1, "to":-2, "fromPort":"R", "toPort":"L", "points":[77.41553497314453,95.00000000000003,87.41553497314453,95.00000000000003,118.40234375,95.00000000000003,118.40234375,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":5, "to":-2, "fromPort":"R", "toPort":"L", "points":[74.41553497314447,156,84.41553497314447,156,116.90234374999997,156,116.90234374999997,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":0, "to":-2, "fromPort":"R", "toPort":"L", "points":[75.41553497314453,219,85.41553497314453,219,117.40234375,219,117.40234375,157,149.38915252685547,157,159.38915252685547,157]},
+{"from":-2, "to":-4, "fromPort":"R", "toPort":"L", "points":[234.22022247314453,157,244.22022247314453,157,288.20144045630167,157,288.20144045630167,157,332.1826584394588,157,342.1826584394588,157]}
+ ]}
+  </textarea>
+
+
+<script src="{{ " /nbextensions/config/main.js " }}" type="text/javascript" charset="utf-8"></script>
+<script src="{{ " /nbextensions/ma/client/html/wizard/main_wizard.js " }}" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
